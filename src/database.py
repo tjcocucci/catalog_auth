@@ -24,6 +24,11 @@ class User(Model):
         password = h.update(password.encode("utf-8"))
         return h.hexdigest()
 
+    def verify_password(self, password):
+        hashed_password = self.password
+        input_password = self.create_password(password)
+        return hashed_password == input_password
+
     def __str__(self):
         return self.username
 

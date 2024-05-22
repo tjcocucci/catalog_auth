@@ -1,7 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from database import db as connection, User
 from schemas import UserRequestModel, UserResponseModel
-
+from datetime import datetime, timedelta
+import settings
+from jose import jwt
 
 app = FastAPI(
     title="auth", description="User authentication and authorization", version="0.1.0"
@@ -55,3 +57,26 @@ async def delete_user(user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     user.delete_instance()
     return {"message": "User deleted"}
+
+
+@app.post("/login")
+async def login(username: str, password: str):
+    user = User.select().where(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not user.verify_password(password):
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+    access_token = create_access_token(username)
+    return {"access_token": access_token, "token_type": "bearer", "user": user}
+
+
+def create_access_token(username: str) -> str:
+    """
+    Function to generate JWT token with username and expiration time
+    """
+    payload = {
+        "sub": username,
+        "exp": datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
