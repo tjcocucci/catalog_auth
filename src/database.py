@@ -5,7 +5,7 @@ import hashlib
 from peewee import *
 
 db = MySQLDatabase(
-    "auth",
+    settings.DATABASE_NAME,
     user=settings.DATABASE_USER,
     password=settings.DATABASE_PASS,
     host=settings.DATABASE_HOST,
