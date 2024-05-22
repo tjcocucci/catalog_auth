@@ -60,15 +60,19 @@ async def delete_user(user_id: int):
 
 
 @app.post("/login")
-async def login(username: str, password: str):
-    user = User.select().where(User.username == username).first()
-    if not user:
+async def login(user: UserRequestModel):
+    userFromDB = User.select().where(User.username == user.username).first()
+    if not userFromDB:
         raise HTTPException(status_code=404, detail="User not found")
-    if not user.verify_password(password):
+    if not userFromDB.verify_password(user.password):
         raise HTTPException(status_code=401, detail="Invalid password")
 
-    access_token = create_access_token(username)
-    return {"access_token": access_token, "token_type": "bearer", "user": user}
+    access_token = create_access_token(userFromDB.username)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": user.username,
+    }
 
 
 def create_access_token(username: str) -> str:
