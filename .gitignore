@@ -1,5 +1,6 @@
 .credentials
 .env
+.venv
 
 __pycache__/
 

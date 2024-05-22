@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
+load_dotenv(find_dotenv('../.env'))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASE_NAME = os.environ.get("DATABASE_NAME")

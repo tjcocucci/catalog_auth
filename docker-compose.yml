@@ -1,0 +1,39 @@
+services:
+  auth-db:
+    image: mysql:latest
+    container_name: auth-db-container
+    env_file:
+      - .env
+    ports:
+      - "3307:3306"
+    volumes:
+      - auth-db-volume:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 2s
+      retries: 20
+
+  auth-api:
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: auth-api-image
+    container_name: auth-api-container
+    ports:
+      - "4000:4000"
+    network_mode: host
+    env_file:
+      - .env
+
+volumes:
+  auth-db-volume:
+
+networks:
+  auth-network:
+
