@@ -1,6 +1,5 @@
 from datetime import datetime
 import settings
-
 import hashlib
 from peewee import *
 
