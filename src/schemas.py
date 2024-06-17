@@ -49,3 +49,7 @@ class UserResponseModel(BaseModel):
     class Config:
         orm_mode = True
         getter_dict = PeeweeGetterDict
+
+
+class TokenData(BaseModel):
+    username: str = None
