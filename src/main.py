@@ -94,7 +94,6 @@ async def session(Authorization: Annotated[Union[str, None], Header()] = None):
     Check if the token is valid. Will not work in swagger UI due to browser security
     """
     try:
-        print(Authorization)
         token = get_token(Authorization)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         return payload
