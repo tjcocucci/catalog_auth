@@ -1,6 +1,6 @@
 from typing import Annotated, Union
 
-from fastapi import FastAPI, HTTPException, Cookie
+from fastapi import FastAPI, HTTPException, Header
 from database import db as connection, User
 from schemas import UserRequestModel, UserResponseModel
 from datetime import datetime, timedelta
@@ -89,12 +89,13 @@ def create_access_token(username: str) -> str:
 
 
 @app.get("/session")
-async def session(token: Annotated[Union[str, None], Cookie()] = None):
+async def session(Authorization: Annotated[Union[str, None], Header()] = None):
     """
     Check if the token is valid. Will not work in swagger UI due to browser security
-    """
+    """ 
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        print(Authorization)
+        payload = jwt.decode(Authorization, settings.SECRET_KEY, algorithms=["HS256"])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
