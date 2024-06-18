@@ -92,12 +92,19 @@ def create_access_token(username: str) -> str:
 async def session(Authorization: Annotated[Union[str, None], Header()] = None):
     """
     Check if the token is valid. Will not work in swagger UI due to browser security
-    """ 
+    """
     try:
         print(Authorization)
-        payload = jwt.decode(Authorization, settings.SECRET_KEY, algorithms=["HS256"])
+        token = get_token(Authorization)
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def get_token(Authorization: str) -> str:
+    if not Authorization:
+        raise HTTPException(status_code=401, detail="Token is missing")
+    return Authorization.split(" ")[1]
