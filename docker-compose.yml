@@ -1,13 +1,13 @@
 services:
   auth-db:
-    image: mysql:latest
     container_name: auth-db-container
+    image: mysql:latest
     env_file:
       - .env
     environment:
       - MYSQL_ROOT_PASSWORD=${DATABASE_PASS}
     ports:
-      - "3306:3306"
+      - "${DATABASE_PORT_HOST}:${DATABASE_PORT_CONTAINER}"
     volumes:
       - auth-db-volume:/var/lib/mysql
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -20,19 +20,19 @@ services:
 
   auth-api:
     container_name: auth-api-container
-    depends_on:
-      auth-db:
-        condition: service_healthy
+    image: auth-api-image
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: auth-api-image
-    ports:
-      - "4000:4000"
-    networks:
-      - auth-network
     env_file:
       - .env
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    ports:
+      - "${API_PORT_HOST}:${API_PORT_CONTAINER}"
+    networks:
+      - auth-network
     stdin_open: true
     tty: true
 
