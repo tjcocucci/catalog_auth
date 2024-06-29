@@ -1,14 +1,23 @@
 from typing import Annotated, Union
 
 from fastapi import FastAPI, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 from database import db as connection, User
-from schemas import UserRequestModel, UserResponseModel
+from schemas import UserLoginRequestModel, UserResponseModel, UserCreationRequestModel
 from datetime import datetime, timedelta
 import settings
 from jose import jwt
 
 app = FastAPI(
     title="auth", description="User authentication and authorization", version="0.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_HOSTS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -28,7 +37,7 @@ def shutdown():
 
 
 @app.post("/users", response_model=UserResponseModel)
-async def create_user(user: UserRequestModel):
+async def create_user(user: UserCreationRequestModel):
 
     if User.select().where(User.username == user.username).first():
         raise HTTPException(status_code=409, detail="Username already exists")
@@ -62,7 +71,7 @@ async def delete_user(user_id: int):
 
 
 @app.post("/login")
-async def login(user: UserRequestModel):
+async def login(user: UserLoginRequestModel):
     userFromDB = User.select().where(User.username == user.username).first()
     if not userFromDB:
         raise HTTPException(status_code=404, detail="User not found")

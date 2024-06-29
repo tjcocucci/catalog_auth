@@ -15,7 +15,7 @@ class PeeweeGetterDict(GetterDict):
         return res
 
 
-class UserRequestModel(BaseModel):
+class UserCreationRequestModel(BaseModel):
     username: str
     password: str
 
@@ -40,6 +40,11 @@ class UserRequestModel(BaseModel):
                 "Password must contain at least one special character (@#$^&*+=)"
             )
         return password
+
+
+class UserLoginRequestModel(BaseModel):
+    username: str
+    password: str
 
 
 class UserResponseModel(BaseModel):
