@@ -3,7 +3,12 @@ from typing import Annotated, Union
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from database import db as connection, User
-from schemas import UserLoginRequestModel, UserResponseModel, UserCreationRequestModel
+from schemas import (
+    UserLoginRequestModel,
+    UserResponseModel,
+    UserCreationRequestModel,
+    UserUpdateRequestModel,
+)
 from datetime import datetime, timedelta
 import settings
 from jose import jwt
@@ -68,6 +73,20 @@ async def delete_user(user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     user.delete_instance()
     return {"message": "User deleted"}
+
+
+@app.patch("/users/{user_id}", response_model=UserResponseModel)
+async def update_user(user_id: int, user: UserUpdateRequestModel):
+    userFromDB = User.select().where(User.id == user_id).first()
+
+    if not userFromDB:
+        raise HTTPException(status_code=404, detail="User not found")
+    userFromDB.username = user.username
+    if not userFromDB.verify_password(user.previous_password):
+        raise HTTPException(status_code=401, detail="Invalid password")
+    userFromDB.password = User.create_password(user.password)
+    userFromDB.save()
+    return userFromDB
 
 
 @app.post("/login")

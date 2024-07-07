@@ -42,6 +42,10 @@ class UserCreationRequestModel(BaseModel):
         return password
 
 
+class UserUpdateRequestModel(UserCreationRequestModel):
+    previous_password: str
+
+
 class UserLoginRequestModel(BaseModel):
     username: str
     password: str
