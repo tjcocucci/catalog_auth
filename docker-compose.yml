@@ -17,6 +17,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 2s
       retries: 20
+    restart: always
 
   auth-api:
     container_name: auth-api-container
@@ -35,6 +36,7 @@ services:
       - auth-network
     stdin_open: true
     tty: true
+    restart: always
 
 volumes:
   auth-db-volume:
