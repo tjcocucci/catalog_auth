@@ -26,6 +26,19 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def db_session_middleware(request, call_next):
+    response = None
+    try:
+        if connection.is_closed():
+            connection.connect()
+        response = await call_next(request)
+    finally:
+        if not connection.is_closed():
+            connection.close()
+    return response
+
+
 @app.on_event("startup")
 def startup():
     if connection.is_closed():
