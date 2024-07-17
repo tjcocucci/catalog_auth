@@ -15,6 +15,7 @@ services:
       - auth-network
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 30s
       timeout: 20s
       retries: 10
     restart: always
